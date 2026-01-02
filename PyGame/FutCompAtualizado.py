@@ -8,18 +8,17 @@ altura = 720
 tela = pygame.display.set_mode((largura, altura))
 clock = pygame.time.Clock()
 
-# --- CARREGAMENTO DE IMAGENS E FONTES DO MENU ---
+#CARREGAMENTO DE IMAGENS E FONTES DO MENU
 pygame.display.set_caption("MENU")
 
-# 1. Ajuste perfeito da tela de fundo
+#  Ajuste tela de fundo
 tela_de_fundo_orig = pygame.image.load("planodefundo.png")
 tela_de_fundo = pygame.transform.scale(tela_de_fundo_orig, (largura, altura))
 
-# 2. Carregar imagem do botão
+# imagem do botão
 img_botao_raw = pygame.image.load("botãoplay.png") 
 img_botao = pygame.transform.scale(img_botao_raw, (300, 110))
 
-# 3. Carregar Fonte TickerBit (O arquivo Tickerbit.ttf deve estar na pasta)
 try:
     font_botao = pygame.font.Font("Tickerbit.ttf", 50) 
 except:
@@ -152,7 +151,7 @@ def animate_ball():
         ball_speed_x *= -1
 
 def animate_player():
-    # Esta função lê a variável global player_speed
+    # lê a variável global player_speed
     player.y += player_speed
     player.top = max(player.top, 0)
     player.bottom = min(player.bottom, altura)
@@ -190,7 +189,6 @@ def tela_resultado():
 
 #LOOP PRINCIPAL
 def jogar(): 
-    # --- CORREÇÃO AQUI: adicionei player_speed ao global ---
     global cpu_points, player_points, inicio_partida, estado_jogo, jogo_parado, player_speed
     
     cpu_points = 0
