@@ -8,18 +8,60 @@ altura = 720
 tela = pygame.display.set_mode((largura, altura))
 clock = pygame.time.Clock()
 
-#MENU DE JOGO
+# --- CARREGAMENTO DE IMAGENS E FONTES DO MENU ---
 pygame.display.set_caption("MENU")
-tela_de_fundo = pygame.image.load("planodefundo.png")
 
-def menu_principal(): #tela de menu principal
+# 1. Ajuste perfeito da tela de fundo
+tela_de_fundo_orig = pygame.image.load("planodefundo.png")
+tela_de_fundo = pygame.transform.scale(tela_de_fundo_orig, (largura, altura))
+
+# 2. Carregar imagem do botão
+img_botao_raw = pygame.image.load("botãoplay.png") 
+img_botao = pygame.transform.scale(img_botao_raw, (300, 110))
+
+# 3. Carregar Fonte TickerBit (O arquivo Tickerbit.ttf deve estar na pasta)
+try:
+    font_botao = pygame.font.Font("Tickerbit.ttf", 50) 
+except:
+    font_botao = pygame.font.Font(None, 60)
+
+def menu_principal(): 
     pygame.display.set_caption("MENU")
 
+    rect_play = img_botao.get_rect(center=(largura/2, altura/2 - 60))
+    rect_sair = img_botao.get_rect(center=(largura/2, altura/2 + 70))
+
+    txt_play = font_botao.render("PLAY", True, "white")
+    txt_sair = font_botao.render("SAIR", True, "white")
+
+    rect_txt_play = txt_play.get_rect(center=rect_play.center)
+    rect_txt_sair = txt_sair.get_rect(center=rect_sair.center)
+
     while True:
+        tela.blit(tela_de_fundo, (0, 0))
+        
+        tela.blit(img_botao, rect_play)
+        tela.blit(img_botao, rect_sair)
 
+        tela.blit(txt_play, rect_txt_play)
+        tela.blit(txt_sair, rect_txt_sair)
 
+        mouse_pos = pygame.mouse.get_pos()
 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if rect_play.collidepoint(mouse_pos):
+                    jogar()
+                
+                if rect_sair.collidepoint(mouse_pos):
+                    pygame.quit()
+                    sys.exit()
+
+        pygame.display.update()
 
 #MÚSICAS
 pygame.mixer.music.load('Vinheta Fox Sports Brasil.mp3')
@@ -38,7 +80,7 @@ timer_font = pygame.font.Font(None, 50)
 texto_gol = gol_font.render("GOOOOOOOOL!", True, "yellow")
 
 #TEMPO DA PARTIDA 
-TEMPO_PARTIDA = 60  # segundos
+TEMPO_PARTIDA = 60 
 inicio_partida = pygame.time.get_ticks()
 
 #ESTADOS
@@ -110,6 +152,7 @@ def animate_ball():
         ball_speed_x *= -1
 
 def animate_player():
+    # Esta função lê a variável global player_speed
     player.y += player_speed
     player.top = max(player.top, 0)
     player.bottom = min(player.bottom, altura)
@@ -146,7 +189,19 @@ def tela_resultado():
     tela.blit(instrucao, (largura//2 - 200, 520))
 
 #LOOP PRINCIPAL
-def jogar(): #vai pra tela de jogo
+def jogar(): 
+    # --- CORREÇÃO AQUI: adicionei player_speed ao global ---
+    global cpu_points, player_points, inicio_partida, estado_jogo, jogo_parado, player_speed
+    
+    cpu_points = 0
+    player_points = 0
+    estado_jogo = JOGANDO
+    jogo_parado = False
+    player_speed = 0 # Garante que começa parado
+    inicio_partida = pygame.time.get_ticks()
+    reset_ball()
+    pygame.mixer.music.play(-1)
+
     pygame.display.set_caption("FutCOMP")
    
     while True:
@@ -182,8 +237,7 @@ def jogar(): #vai pra tela de jogo
                         pygame.mixer.music.play(-1)
 
                     if event.key == pygame.K_ESCAPE:
-                        pygame.quit()
-                        sys.exit()
+                        return 
 
         if estado_jogo == JOGANDO:
             if not jogo_parado:
@@ -218,3 +272,6 @@ def jogar(): #vai pra tela de jogo
 
         pygame.display.update()
         clock.tick(60)
+
+# --- EXECUÇÃO ---
+menu_principal()
