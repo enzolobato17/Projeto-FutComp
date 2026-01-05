@@ -24,6 +24,7 @@ try:
 except:
     font_botao = pygame.font.Font(None, 60)
 
+#MENU PRINCIPAL
 def menu_principal(): 
     pygame.display.set_caption("MENU")
 
@@ -36,6 +37,10 @@ def menu_principal():
     rect_txt_play = txt_play.get_rect(center=rect_play.center)
     rect_txt_sair = txt_sair.get_rect(center=rect_sair.center)
 
+    fonte_titulo = pygame.font.Font("Minecraft.ttf", 120)
+    titulo = fonte_titulo.render("FutComp", True, (255, 215, 0))
+    titulo_rect = titulo.get_rect(center=(largura // 2 + 20, 150))
+
     while True:
         tela.blit(tela_de_fundo, (0, 0))
         
@@ -44,9 +49,11 @@ def menu_principal():
 
         tela.blit(txt_play, rect_txt_play)
         tela.blit(txt_sair, rect_txt_sair)
+        tela.blit(titulo, titulo_rect)
 
         mouse_pos = pygame.mouse.get_pos()
-
+        
+        pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -73,7 +80,7 @@ barulho_gol.set_volume(0.5)
 
 #FONTES 
 score_font = pygame.font.Font(None, 100)
-gol_font = pygame.font.Font(None, 140)
+gol_font = pygame.font.Font("Minecraft.ttf", 140)
 timer_font = pygame.font.Font(None, 50)
 
 texto_gol = gol_font.render("GOOOOOOOOL!", True, "yellow")
@@ -110,13 +117,15 @@ jogo_parado = False
 tempo_gol = 0
 TEMPO_GOL_MS = 3000
 
-#FUNÇÕES
+#FUNÇÔES
+#POSIÇÃO BOLA PÓS-GOL
 def reset_ball():
     global ball_speed_x, ball_speed_y
     ball.center = (largura / 2, random.randint(50, altura - 50))
     ball_speed_x *= random.choice([-1, 1])
     ball_speed_y *= random.choice([-1, 1])
 
+#PLACAR GOL
 def point_won(winner):
     global cpu_points, player_points, jogo_parado, tempo_gol
 
@@ -132,6 +141,7 @@ def point_won(winner):
     barulho_gol.stop()
     barulho_gol.play()
 
+#ANIMAÇÃO DA BOLA
 def animate_ball():
     global ball_speed_x, ball_speed_y
 
@@ -150,12 +160,13 @@ def animate_ball():
     if ball.colliderect(player) or ball.colliderect(cpu):
         ball_speed_x *= -1
 
+#MOVIMENTAÇÃO DO PLAYER
 def animate_player():
-    # lê a variável global player_speed
     player.y += player_speed
     player.top = max(player.top, 0)
     player.bottom = min(player.bottom, altura)
 
+#MOVIMENTAÇÃO DA CPU
 def animate_cpu():
     cpu_speed = 5
     if cpu.centery < ball.centery:
@@ -166,6 +177,7 @@ def animate_cpu():
     cpu.top = max(cpu.top, 0)
     cpu.bottom = min(cpu.bottom, altura)
 
+#Tela Final
 def tela_resultado():
     tela.fill((0, 120, 0))
 
@@ -180,12 +192,12 @@ def tela_resultado():
         vencedor = "EMPATE!"
 
     vencedor_txt = score_font.render(vencedor, True, "white")
-    instrucao = timer_font.render("R - Reiniciar | ESC - Sair", True, "white")
+    instrucao = timer_font.render("Restart | Exit", True, "white")
 
     tela.blit(fim, (largura//2 - 220, 100))
-    tela.blit(placar, (largura//2 - 150, 250))
+    tela.blit(placar, (largura//2 - 120, 250))
     tela.blit(vencedor_txt, (largura//2 - 220, 380))
-    tela.blit(instrucao, (largura//2 - 200, 520))
+    tela.blit(instrucao, (largura//2 - 130 , 520))
 
 #LOOP PRINCIPAL
 def jogar(): 
@@ -195,7 +207,7 @@ def jogar():
     player_points = 0
     estado_jogo = JOGANDO
     jogo_parado = False
-    player_speed = 0 # Garante que começa parado
+    player_speed = 0 
     inicio_partida = pygame.time.get_ticks()
     reset_ball()
     pygame.mixer.music.play(-1)
@@ -214,6 +226,7 @@ def jogar():
                 pygame.quit()
                 sys.exit()
 
+            #COMANDOS DO PLAYER
             if estado_jogo == JOGANDO:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -225,6 +238,7 @@ def jogar():
                     if event.key in (pygame.K_UP, pygame.K_DOWN):
                         player_speed = 0
 
+            #FINAL DO JOGO
             if estado_jogo == RESULTADO:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
@@ -256,7 +270,8 @@ def jogar():
             tela.blit(score_font.render(str(cpu_points), True, "white"), (largura/4, 20))
             tela.blit(score_font.render(str(player_points), True, "white"), (3*largura/4, 20))
             tela.blit(timer_font.render(f"{tempo_restante}", True, "white"), (largura/2 - 20, 20))
-
+            
+            #ELEMENTOS GRÁFICOS
             pygame.draw.aaline(tela, 'white', (largura/2, 0), (largura/2, altura))
             pygame.draw.ellipse(tela, 'white', ball)
             pygame.draw.rect(tela, 'white', cpu)
@@ -271,5 +286,5 @@ def jogar():
         pygame.display.update()
         clock.tick(60)
 
-# --- EXECUÇÃO ---
+
 menu_principal()
